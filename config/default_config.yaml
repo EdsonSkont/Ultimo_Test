@@ -1,0 +1,60 @@
+# OrbitalChain Default Configuration
+# ==================================
+
+# Satellite Network Parameters
+satellite:
+  altitude_km: 550
+  num_shards: 7
+  satellites_per_shard: 20
+  orbital_inclination_deg: 53
+
+# Cryptographic Parameters
+crypto:
+  prime_modulus: 2305843009213693951  # 2^61 - 1 (Mersenne prime)
+  security_parameter: 128
+  num_parties: 10
+
+# Truth Discovery Parameters
+truth_discovery:
+  decay_factor: 0.9
+  scale_factor: 1000000
+  max_epochs: 100
+  convergence_threshold: 0.001
+
+# D-Stream Clustering Parameters
+clustering:
+  grid_size: 0.1
+  density_threshold: 2.0
+  decay_factor: 0.998
+  gap_time: 10.0
+  dimensionality: 3
+
+# SA-SBFT Consensus Parameters
+consensus:
+  epsilon: 1.2  # Threshold adjustment parameter
+  checkpoint_interval: 100
+  view_change_timeout_sec: 30.0
+  energy_threshold_active: 0.5
+  energy_threshold_semi: 0.2
+  elevation_min_deg: 10.0
+
+# Channel Model Parameters
+channel:
+  frequency_hz: 26.5e9  # Ka-band
+  transmit_power_dbw: 10
+  transmit_gain_dbi: 35
+  receive_gain_dbi: 40
+  system_noise_temp_k: 300
+  bandwidth_hz: 500e6
+
+# ISL Parameters
+isl:
+  max_distance_km: 5000
+  wavelength_nm: 1550  # Optical ISL
+  pointing_error_urad: 1.0
+
+# Experiment Parameters
+experiments:
+  num_trials: 100
+  random_seed: 42
+  output_dir: "results/"

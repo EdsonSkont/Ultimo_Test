@@ -1,0 +1,119 @@
+{
+  "dataset_name": "CCSDS Satellite Inter-Satellite Link (ISL) Dataset",
+  "version": "1.0.0",
+  "standard": "CCSDS 133.0-B-2 / 232.0-B-4 / 355.0-B-2",
+  "generated_utc": "2025-11-15T08:41:20",
+  "intended_use": "Academic experiments in satellite communications, network protocols, anomaly detection, ML on telemetry",
+  "constellation_model": "LEO-MEO hybrid (Iridium NEXT / Starlink style)",
+  "orbit_altitude_km": 780,
+  "inclination_deg": 86.4,
+  "crosslink_frequency": "Ka-band 26 GHz (ISL)",
+  "downlink_frequency": "L-band 1621.25 MHz",
+  "files": [
+    {
+      "filename": "01_tm_housekeeping.bin",
+      "format": "binary",
+      "standard": "CCSDS Space Packet (TM)",
+      "packets": 500,
+      "apid": "0x0C3",
+      "description": "Raw CCSDS TM housekeeping packets. Parse with 09_ccsds_parser.py",
+      "fields": "battery_V, panel_temp_C, solar_mA, adcs_mode, quaternion, rssi, fault_flag"
+    },
+    {
+      "filename": "02_tc_command_sequence.bin",
+      "format": "binary",
+      "standard": "CCSDS Space Packet (TC)",
+      "packets": 50,
+      "apid": "multiple",
+      "description": "TC command frames for ADCS, payload, downlink, and memory management"
+    },
+    {
+      "filename": "03_aos_sar_frames.bin",
+      "format": "binary",
+      "standard": "CCSDS AOS Frame (CCSDS 732.0-B-3)",
+      "packets": 100,
+      "vcid": 15,
+      "description": "AOS frames carrying SAR bulk science data. Fixed 1115-byte frames + FECF"
+    },
+    {
+      "filename": "04_telemetry_decoded.csv",
+      "format": "CSV",
+      "rows": 500,
+      "sample_interval_ms": 400,
+      "description": "Pre-decoded telemetry for direct ML / statistical analysis",
+      "columns": "timestamp_utc, seq, apid, battery_V, panel_temp_C, solar_mA, adcs_mode, rw_rpm, rssi_dBm, orbit_num, fault_flag, q1, q2, cpu_temp_C"
+    },
+    {
+      "filename": "05_isl_stream_log.json",
+      "format": "JSON",
+      "packets": 200,
+      "description": "Realistic ISL crosslink log with mixed packet types, routing, timing, user IP, fault alerts",
+      "apids": [
+        "0x0C3",
+        "0x200",
+        "0x301",
+        "0x080",
+        "0x4FF",
+        "0x100",
+        "0x500",
+        "0x7FE"
+      ]
+    },
+    {
+      "filename": "06_gnss_ephemeris.csv",
+      "format": "CSV",
+      "rows": 72,
+      "satellites": 24,
+      "epochs": 3,
+      "description": "GPS SV ephemeris broadcast packets (RINEX-compatible format)",
+      "columns": "epoch_utc, svid, prn, health, ura_m, toe_s, semi_major_axis_m, eccentricity, ..."
+    },
+    {
+      "filename": "07_attitude_quaternions.csv",
+      "format": "CSV",
+      "rows": 1000,
+      "sample_rate_Hz": 10,
+      "description": "ADCS attitude quaternion time series with angular velocity and Euler angles",
+      "columns": "time_s, q0, q1, q2, q3, wx, wy, wz, roll, pitch, yaw, adcs_mode, pointing_error_arcsec"
+    },
+    {
+      "filename": "08_power_subsystem.csv",
+      "format": "CSV",
+      "rows": 480,
+      "sample_interval_min": 1,
+      "duration_hours": 8,
+      "description": "Power subsystem telemetry across 5 orbital periods (96 min/orbit)",
+      "columns": "timestamp_utc, battery_V, soc_pct, solar_W, load_W, bus_V, charge_A, discharge_A, panel_temp_C, pcdu_temp_C, eclipse, orbit_phase_deg"
+    },
+    {
+      "filename": "09_ccsds_parser.py",
+      "format": "Python 3 script",
+      "dependencies": "stdlib only",
+      "description": "Standalone CCSDS Space Packet parser. Run: python 09_ccsds_parser.py <binary_file>",
+      "functions": "parse_file(), parse_primary_header(), decode_hk_payload(), crc16_ccitt()"
+    },
+    {
+      "filename": "10_dataset_metadata.json",
+      "format": "JSON",
+      "description": "This file. Dataset documentation and schema reference"
+    }
+  ],
+  "crc_algorithm": "CRC-16/CCITT (poly=0x1021, init=0xFFFF)",
+  "timestamp_format": "CCSDS TAI (4-byte coarse seconds + 2-byte fine, epoch=2000-01-01T11:58:55.816Z)",
+  "byte_order": "Big-endian (network order) \u2014 CCSDS standard",
+  "anomalies_injected": {
+    "watchdog_fault": "Every 97th TM packet has fault_flag=0x01",
+    "eclipse_events": "File 08 contains 5 eclipse passages per 8-hour window",
+    "pointing_error_spikes": "File 07 contains Gaussian noise on pointing_error_arcsec"
+  },
+  "suggested_experiments": [
+    "ML anomaly detection on fault_flag using telemetry time series (File 04)",
+    "CCSDS protocol stack implementation and CRC verification (Files 01-03, 09)",
+    "ISL routing protocol simulation using stream topology (File 05)",
+    "GNSS positioning algorithm implementation (File 06)",
+    "Power budget optimization and eclipse prediction (File 08)",
+    "Attitude control system analysis via quaternion kinematics (File 07)",
+    "SAR image reconstruction from AOS payload bytes (File 03)",
+    "Predictive maintenance on battery SoC degradation (File 08)"
+  ]
+}
